@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#071b18" />
+  <title>Operations Dashboard · ShuttlePulse</title>
+  <link rel="icon" href="shuttle-app-icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="shuttle-components.css" />
+  <link rel="stylesheet" href="operations-dashboard.css" />
+</head>
+<body class="admin-page">
+  <aside class="admin-sidebar">
+    <a class="brand inverse" href="index.html"><img src="shuttle-logo-mark.svg" alt="" /><span><strong>ShuttlePulse</strong><small>Operations</small></span></a>
+    <nav><a class="active" href="#overview"><span>⌂</span>Overview</a><a href="#fleet"><span>▣</span>Fleet</a><a href="#routes"><span>⇄</span>Routes</a><a href="#crowds"><span>◉</span>Stop demand</a><a href="#alerts"><span>!</span>Alerts</a></nav>
+    <div class="sidebar-footer"><small>Signed in as</small><strong id="adminIdentity">Operations Admin</strong><button id="adminLogout" class="quiet-button">Sign out</button></div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-topbar"><div><span class="eyebrow">KNUST SHUTTLE NETWORK</span><h1>Operations overview</h1><p>Monitor destination routes, shuttle direction and stop demand.</p></div><div class="topbar-actions"><span id="adminClock">00:00</span><button id="resetDemo" class="secondary-button">Reset demo</button></div></header>
+
+    <section id="overview" class="metric-grid">
+      <article><span class="metric-icon green">↗</span><div><small>Active shuttles</small><strong id="activeShuttleMetric">0</strong><em>moving now</em></div></article>
+      <article><span class="metric-icon blue">⇄</span><div><small>Destination routes</small><strong>4</strong><em>directional</em></div></article>
+      <article><span class="metric-icon amber">◷</span><div><small>Average wait</small><strong id="waitMetric">—</strong><em>across campus</em></div></article>
+      <article><span class="metric-icon red">!</span><div><small>Service issues</small><strong id="issueMetric">0</strong><em>need attention</em></div></article>
+    </section>
+
+    <section class="admin-dashboard-grid">
+      <article class="admin-card map-card-large">
+        <header><div><span class="eyebrow">REAL-TIME FLEET</span><h2>Live destination map</h2></div><span class="live-badge"><i></i> Updating</span></header>
+        <div id="adminMap"></div>
+      </article>
+
+      <article id="alerts" class="admin-card alert-composer">
+        <header><div><span class="eyebrow">COMMUNICATIONS</span><h2>Publish service alert</h2></div></header>
+        <form id="adminAlertForm">
+          <label class="field"><span>Alert type</span><select id="alertType"><option>Service update</option><option>Traffic delay</option><option>Route closure</option><option>Emergency</option></select></label>
+          <label class="field"><span>Headline</span><input id="alertHeadline" maxlength="70" placeholder="e.g. Delay on Commercial → KSB" required /></label>
+          <label class="field"><span>Details</span><textarea id="alertDetails" rows="4" placeholder="Add a short message for students" required></textarea></label>
+          <button class="primary-button wide" type="submit">Publish alert</button>
+        </form>
+        <div id="recentAlerts" class="recent-alerts"></div>
+      </article>
+
+      <article id="routes" class="admin-card route-health-card">
+        <header><div><span class="eyebrow">ROUTE HEALTH</span><h2>Destination coverage</h2></div><small>Live vehicles</small></header>
+        <div id="routeHealth" class="route-health"></div>
+      </article>
+
+      <article id="fleet" class="admin-card fleet-table-card">
+        <header><div><span class="eyebrow">FLEET HEALTH</span><h2>All shuttles</h2></div><button id="refreshFleet" class="quiet-button">Refresh</button></header>
+        <div class="table-wrap"><table><thead><tr><th>Vehicle</th><th>Destination</th><th>Currently at</th><th>Next stop</th><th>Capacity</th><th>Status</th></tr></thead><tbody id="fleetTableBody"></tbody></table></div>
+      </article>
+
+      <article id="crowds" class="admin-card crowd-card">
+        <header><div><span class="eyebrow">STOP DEMAND</span><h2>Busiest stops</h2></div><small>Live estimate</small></header>
+        <div id="crowdBars" class="crowd-bars"></div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" defer></script>
+  <script src="shuttle-maps-config.js" defer></script>
+  <script src="shuttle-core.js" defer></script>
+  <script src="shuttle-data-store.js" defer></script>
+  <script src="shuttle-network.js" defer></script>
+  <script src="team-auth.js" defer></script>
+  <script src="operations-dashboard.js" defer></script>
+</body>
+</html>

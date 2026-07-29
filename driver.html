@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#071b18" />
+  <title>Driver Console · ShuttlePulse</title>
+  <link rel="icon" href="shuttle-app-icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="shuttle-components.css" />
+  <link rel="stylesheet" href="driver-console.css" />
+</head>
+<body class="console-page driver-page">
+  <header class="console-header">
+    <a class="brand inverse" href="index.html"><img src="shuttle-logo-mark.svg" alt="" /><span><strong>ShuttlePulse</strong><small>Driver console</small></span></a>
+    <div class="console-user"><span id="driverIdentity">Demo driver</span><button id="driverLogout" class="quiet-button">Sign out</button></div>
+  </header>
+
+  <main class="driver-layout">
+    <section class="driver-hero">
+      <div><span class="eyebrow">LIVE OPERATIONS</span><h1>Drive the destination, not a colour.</h1><p>Your route, next stop and travel status update automatically while the shuttle moves.</p></div>
+      <div class="status-orb" id="driverStatusOrb"><span></span><strong id="driverTripStatus">Trip inactive</strong><small id="gpsStatus">GPS ready</small></div>
+    </section>
+
+    <section class="active-direction-card">
+      <div class="active-trip-title"><small>CURRENT TRIP</small><strong id="driverDirectionLabel">Commercial → KSB</strong><span id="turnaroundMessage">Ready to begin</span></div>
+      <div class="direction-summary driver-status-summary">
+        <span><small>Current status</small><strong id="driverCurrentStatus">En route</strong></span>
+        <span><small>Next stop</small><strong id="driverNextStop">Unity Hall</strong></span>
+        <span><small>Capacity</small><strong id="driverCapacityStatus">Seats available</strong></span>
+        <span><small>Schedule</small><strong id="driverScheduleStatus">On time</strong></span>
+      </div>
+    </section>
+
+    <section class="driver-grid">
+      <article class="console-card trip-setup-card">
+        <div class="card-heading"><div><span class="eyebrow">TRIP SETUP</span><h2>Choose assignment</h2></div><span class="step-badge">01</span></div>
+        <div class="field-grid">
+          <label class="field"><span>Vehicle</span><select id="driverShuttleSelect"></select></label>
+          <label class="field"><span>Route</span><select id="driverRouteSelect"></select></label>
+          <label class="field"><span>Starting direction</span><select id="driverDirectionSelect"></select></label>
+        </div>
+        <div class="trip-summary"><div><small>Location source</small><strong id="locationSource">Phone GPS</strong></div><div><small>Route progress</small><strong id="driverProgress">0%</strong></div></div>
+        <button id="startTripButton" class="primary-button wide large">Start trip</button>
+        <button id="endTripButton" class="danger-button wide large" hidden>End trip</button>
+      </article>
+
+      <article class="console-card driver-map-card">
+        <div class="card-heading compact"><div><span class="eyebrow">LIVE POSITION</span><h2>Directional route map</h2></div><span id="mapLiveBadge" class="live-badge muted"><i></i> Offline</span></div>
+        <div id="driverMap" class="driver-map"></div>
+      </article>
+
+      <article class="console-card capacity-card">
+        <div class="card-heading"><div><span class="eyebrow">CAPACITY</span><h2>What is the current load?</h2></div><span class="step-badge">02</span></div>
+        <div id="capacityButtons" class="capacity-buttons"></div>
+        <p class="helper-text">Update capacity only while safely stopped. Students see the change immediately.</p>
+      </article>
+
+      <article class="console-card incident-card">
+        <div class="card-heading"><div><span class="eyebrow">SERVICE STATUS</span><h2>Report an issue</h2></div><span class="step-badge">03</span></div>
+        <div class="incident-buttons">
+          <button data-incident="Heavy traffic"><span>🚦</span><strong>Heavy traffic</strong><small>Warn students of delay</small></button>
+          <button data-incident="Road blocked"><span>⛔</span><strong>Road blocked</strong><small>Route cannot continue</small></button>
+          <button data-incident="Mechanical issue"><span>🔧</span><strong>Mechanical issue</strong><small>Mark shuttle unavailable</small></button>
+          <button data-incident="Emergency"><span>🆘</span><strong>Emergency</strong><small>Send urgent alert</small></button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" defer></script>
+  <script src="shuttle-maps-config.js" defer></script>
+  <script src="shuttle-core.js" defer></script>
+  <script src="shuttle-data-store.js" defer></script>
+  <script src="shuttle-network.js" defer></script>
+  <script src="team-auth.js" defer></script>
+  <script src="driver-console.js" defer></script>
+</body>
+</html>

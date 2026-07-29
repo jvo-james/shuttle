@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#071b18" />
+  <title>Team Sign In · ShuttlePulse</title>
+  <link rel="icon" href="shuttle-app-icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="shuttle-components.css" />
+  <link rel="stylesheet" href="team-login.css" />
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <section class="login-story">
+      <a class="brand inverse" href="index.html"><img src="shuttle-logo-mark.svg" alt="" /><span><strong>ShuttlePulse</strong><small>KNUST shuttle network</small></span></a>
+      <div><span class="eyebrow">DESTINATION-FIRST OPERATIONS</span><h1>Keep every shuttle moving in the right direction.</h1><p>Drivers share live direction, next stop and capacity. Operations monitors the full campus network.</p></div>
+      <div class="login-route-list"><span>Commercial ↔ KSB</span><span>Brunei ↔ KSB</span><span>Commercial ↔ Medical Village</span><span>KSB ↔ Medical Village</span></div>
+    </section>
+
+    <section class="login-form-side">
+      <div class="login-card">
+        <span class="eyebrow">TEAM ACCESS</span><h2>Sign in to your console</h2><p>Select a demo role. The credentials are filled automatically.</p>
+        <div class="role-tabs"><button class="active" data-role="driver">Driver</button><button data-role="admin">Operations admin</button></div>
+        <form id="loginForm">
+          <input type="hidden" id="loginRole" value="driver" />
+          <label class="field"><span>Email</span><input id="loginEmail" type="email" value="driver@knust.edu.gh" required /></label>
+          <label class="field"><span>Password</span><input id="loginPassword" type="password" value="demo123" required /></label>
+          <p id="loginError" class="login-error"></p>
+          <button class="primary-button wide large" type="submit">Open driver console</button>
+        </form>
+        <a class="back-link" href="index.html">← Return to student map</a>
+      </div>
+    </section>
+  </main>
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+  <script src="shuttle-core.js" defer></script>
+  <script src="team-auth.js" defer></script>
+</body>
+</html>

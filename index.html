@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f4f4" />
+  <meta name="description" content="Live KNUST campus shuttle tracking built around the destinations students actually use." />
+  <title>ShuttlePulse · KNUST</title>
+  <link rel="manifest" href="shuttle-manifest.json" />
+  <link rel="icon" href="shuttle-app-icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="shuttle-components.css" />
+  <link rel="stylesheet" href="student-map.css" />
+</head>
+<body class="student-app">
+  <div id="appLoader" class="app-loader" role="status" aria-live="polite">
+    <div class="loader-logo"><img src="shuttle-logo-mark.svg" alt="" /></div>
+    <div><strong>ShuttlePulse</strong><span>Opening the KNUST live map…</span></div>
+  </div>
+
+  <main class="map-shell">
+    <div id="map" aria-label="Live KNUST shuttle map"></div>
+
+    <header class="map-topbar" aria-label="Map navigation">
+      <a class="map-brand-button" href="index.html" aria-label="ShuttlePulse home" title="ShuttlePulse">
+        <img src="shuttle-logo-mark.svg" alt="" />
+      </a>
+
+      <section id="journeySearch" class="journey-search" aria-label="Plan a campus trip">
+        <div class="journey-rail" aria-hidden="true"><span class="origin-dot"></span><i></i><span class="destination-pin"></span></div>
+        <div class="journey-fields">
+          <label class="journey-stop-row pickup-row">
+            <span class="journey-label" id="pickupPrompt">Nearest pickup stop</span>
+            <select id="pickupSelect" aria-label="Choose pickup stop">
+              <option value="auto">Finding nearest stop…</option>
+            </select>
+          </label>
+          <label class="journey-stop-row destination-row">
+            <span class="journey-label">Where are you going?</span>
+            <select id="destinationSelect" aria-label="Choose destination">
+              <option value="">Select destination</option>
+            </select>
+          </label>
+        </div>
+        <button id="clearDestination" class="clear-button" aria-label="Clear destination">×</button>
+      </section>
+
+      <button id="alertsButton" class="top-circle-button" aria-label="View service alerts" title="Service alerts">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.4 15a1 1 0 0 0 .83 1.55h13.54A1 1 0 0 0 19.6 15L18 12.6V9a6 6 0 0 0-6-6Zm0 18a2.8 2.8 0 0 0 2.65-1.9h-5.3A2.8 2.8 0 0 0 12 21Z"/></svg>
+        <span id="alertBadge" class="notification-dot">1</span>
+      </button>
+    </header>
+
+    <button id="topPanelToggle" class="panel-toggle top-panel-toggle" type="button" aria-expanded="true" aria-controls="journeySearch routeChips" aria-label="Collapse trip planner">
+      <svg class="panel-toggle-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6.7 14.7 5.3-5.3 5.3 5.3-1.4 1.4-3.9-3.9-3.9 3.9-1.4-1.4Z"/></svg>
+      <span class="panel-toggle-label">Hide trip planner</span>
+    </button>
+
+    <section id="serviceBanner" class="service-banner" aria-live="polite" hidden>
+      <span class="service-alert-dot" aria-hidden="true"></span>
+      <div><strong id="bannerTitle">Service update</strong><span id="bannerText">A campus route has an update.</span></div>
+      <button id="dismissBanner" aria-label="Dismiss alert">×</button>
+    </section>
+
+    <div id="routeChips" class="route-chips" aria-label="Filter shuttle routes"></div>
+
+    <div id="nearbyEmptyState" class="nearby-empty-state" role="status" aria-live="polite" hidden>
+      <strong>No shuttles within 2 km</strong>
+      <span>Pinch out or drag the map to explore farther away.</span>
+    </div>
+
+    <nav class="map-controls" aria-label="Map controls">
+      <button id="recenterButton" class="floating-map-button primary-location-control" aria-label="Recenter on my location" title="My location">
+        <svg viewBox="0 0 24 24"><path d="M11 2h2v3.05A7 7 0 0 1 18.95 11H22v2h-3.05A7 7 0 0 1 13 18.95V22h-2v-3.05A7 7 0 0 1 5.05 13H2v-2h3.05A7 7 0 0 1 11 5.05V2Zm1 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 2.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/></svg>
+      </button>
+      <button id="fitCampusButton" class="floating-map-button" aria-label="Show all campus shuttles" title="View campus">
+        <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h4v2H6a.5.5 0 0 0-.5.5V9h-2V5Zm10-2h4a2 2 0 0 1 2 2v4h-2V5.5A.5.5 0 0 0 17.5 5H14V3Zm4 12h2v4a2 2 0 0 1-2 2h-4v-2h3.5a.5.5 0 0 0 .5-.5V15ZM3.5 15h2v3.5a.5.5 0 0 0 .5.5h4v2H6a2 2 0 0 1-2-2v-4Z"/></svg>
+      </button>
+
+      <button id="landmarkToggleButton" class="floating-map-button active landmark-control" aria-label="Hide selected campus landmarks" title="Campus landmarks">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 15 8l6 .9-4.4 4.3 1 6.1-5.6-3-5.6 3 1-6.1L3 8.9 9 8l3-5.5Zm0 4.2-1.5 3-3.3.5 2.4 2.3-.6 3.3 3-1.6 3 1.6-.6-3.3 2.4-2.3-3.3-.5-1.5-3Z"/></svg>
+      </button>
+      <button id="stopToggleButton" class="floating-map-button active" aria-label="Show or hide campus stops" title="Campus stops">
+        <svg viewBox="0 0 24 24"><path d="M7 2h10a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3l1.5 3h-2.3l-1-2H8.8l-1 2H5.5L7 17a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3Zm0 2a1 1 0 0 0-1 1v6h12V5a1 1 0 0 0-1-1H7Zm1 9.2a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6Zm8 0a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6Z"/></svg>
+      </button>
+    </nav>
+
+    <section id="recommendationCard" class="recommendation-card" aria-live="polite" tabindex="0">
+      <div class="recommendation-route-icon" aria-hidden="true"><span>BUS</span></div>
+      <div class="recommendation-copy">
+        <div class="recommendation-heading">
+          <div><small id="recommendationEyebrow">BEST SHUTTLE</small><strong id="recommendationTitle">Finding your best shuttle…</strong></div>
+          <span id="recommendationVehicle" class="recommendation-vehicle">Waiting for live data</span>
+        </div>
+        <div class="recommendation-details">
+          <p><span>Currently near</span><b id="recommendationCurrent">—</b></p>
+          <p><span>Next stop</span><b id="recommendationNext">—</b></p>
+          <p><span>Estimated arrival</span><b id="recommendationEta">—</b></p>
+          <p><span>Capacity</span><b id="recommendationCapacity" class="capacity-status-badge neutral">—</b></p>
+        </div>
+        <div class="recommendation-reason"><span>Why this shuttle?</span><strong id="recommendationReason">Fastest available option</strong></div>
+      </div>
+      <button id="recommendationAction" class="recommendation-action" type="button">View route</button>
+    </section>
+
+    <button id="bottomPanelToggle" class="panel-toggle bottom-panel-toggle" type="button" aria-expanded="true" aria-controls="recommendationCard" aria-label="Collapse shuttle recommendation">
+      <svg class="panel-toggle-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6.7 14.7 5.3-5.3 5.3 5.3-1.4 1.4-3.9-3.9-3.9 3.9-1.4-1.4Z"/></svg>
+      <span class="bottom-toggle-copy"><small>SHUTTLE CARD</small><strong id="bottomToggleSummary">Hide recommendation</strong></span>
+    </button>
+
+    <nav class="mobile-map-dock" aria-label="Quick map actions">
+      <button class="dock-action active" data-map-action="nearby"><svg viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 5.8 8 12 8 12s8-6.2 8-12a8 8 0 0 0-8-8Zm0 11.5A3.5 3.5 0 1 1 12 6a3.5 3.5 0 0 1 0 7.5Z"/></svg><span>Nearby</span></button>
+      <button class="dock-action active" data-map-action="stops"><svg viewBox="0 0 24 24"><path d="M7 2h10a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3l1.5 3h-2.3l-1-2H8.8l-1 2H5.5L7 17a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3Zm0 2a1 1 0 0 0-1 1v6h12V5a1 1 0 0 0-1-1H7Zm1 9.2a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6Zm8 0a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6Z"/></svg><span>Stops</span></button>
+      <button class="dock-action" data-map-action="report"><svg viewBox="0 0 24 24"><path d="M11 3h2v11h-2V3Zm0 14h2v2h-2v-2ZM12 0 1.5 21h21L12 0Z"/></svg><span>Report</span></button>
+    </nav>
+  </main>
+
+  <section id="detailSheet" class="bottom-sheet" aria-hidden="true" aria-label="Shuttle details">
+    <div class="sheet-scrim" data-close-sheet></div>
+    <article class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <button class="sheet-handle" data-close-sheet aria-label="Close details"></button>
+      <div id="sheetContent"></div>
+    </article>
+  </section>
+
+  <section id="reportModal" class="modal" aria-hidden="true">
+    <div class="modal-scrim" data-close-modal></div>
+    <article class="modal-card" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
+      <header><div><small>QUICK REPORT</small><h2 id="reportTitle">What are you seeing?</h2></div><button data-close-modal aria-label="Close">×</button></header>
+      <form id="reportForm"><input type="hidden" id="reportShuttleId" /><div id="reportOptions" class="report-options"></div><button type="submit" class="primary-button wide">Submit report</button></form>
+    </article>
+  </section>
+
+  <section id="alertsDrawer" class="side-drawer" aria-hidden="true">
+    <div class="drawer-scrim" data-close-drawer></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="alertsTitle">
+      <header><div><small>CAMPUS STATUS</small><h2 id="alertsTitle">Service alerts</h2></div><button data-close-drawer aria-label="Close">×</button></header>
+      <div id="alertsList" class="alerts-list"></div>
+    </aside>
+  </section>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" defer></script>
+  <script src="shuttle-maps-config.js" defer></script>
+  <script src="shuttle-core.js" defer></script>
+  <script src="shuttle-data-store.js" defer></script>
+  <script src="shuttle-network.js" defer></script>
+  <script src="campus-landmarks-data.js" defer></script>
+  <script src="campus-landmarks.js" defer></script>
+  <script src="user-location.js" defer></script>
+  <script src="live-shuttles.js" defer></script>
+  <script src="service-reports.js" defer></script>
+  <script src="trip-recommendations.js" defer></script>
+  <script src="student-map.js" defer></script>
+</body>
+</html>
